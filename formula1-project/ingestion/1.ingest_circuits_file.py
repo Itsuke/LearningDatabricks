@@ -4,6 +4,23 @@
 
 # COMMAND ----------
 
+dbutils.widgets.help()
+
+# COMMAND ----------
+
+dbutils.widgets.text("p_data_source", "No source input")
+v_data_source = dbutils.widgets.get("p_data_source")
+
+# COMMAND ----------
+
+# MAGIC %run "../includes/configuration"
+
+# COMMAND ----------
+
+# MAGIC %run "../includes/common_functions"
+
+# COMMAND ----------
+
 # MAGIC %md
 # MAGIC ##### Step 1 - Read the csv file with Spark dataframe reader
 
@@ -26,7 +43,7 @@ circuits_schema = StructType(fields=[StructField("circuitId", IntegerType(), nul
 
 # COMMAND ----------
 
-circuits_with_schema_sdf = spark.read.schema(circuits_schema).csv("dbfs:/mnt/formula1datalakestudy/raw/circuits.csv", header=True)
+circuits_with_schema_sdf = spark.read.schema(circuits_schema).csv(f"{raw_catalog_path}/circuits.csv", header=True)
 
 # COMMAND ----------
 
@@ -64,6 +81,12 @@ display(circuits_selected_sdf)
 
 # MAGIC %md
 # MAGIC ##### Step 3 - Rename the columns withColumnRenamed
+# MAGIC 1. Rename circuitId, circuitRed, lat, lng, alt
+# MAGIC 2. Add data_source from input param
+
+# COMMAND ----------
+
+from pyspark.sql.functions import lit
 
 # COMMAND ----------
 
@@ -72,7 +95,8 @@ circuits_renamed_sdf = circuits_selected_sdf \
     .withColumnRenamed("circuitRef", "circuit_ref") \
     .withColumnRenamed("lat", "latitude") \
     .withColumnRenamed("lng", "longitude") \
-    .withColumnRenamed("alt", "altitude")
+    .withColumnRenamed("alt", "altitude") \
+    .withColumn("data_source", lit(v_data_source))
 
 # COMMAND ----------
 
@@ -89,7 +113,7 @@ from pyspark.sql.functions import current_timestamp
 
 # COMMAND ----------
 
-circuits_final_sdf = circuits_renamed_sdf.withColumn("ingestion_date", current_timestamp())
+circuits_final_sdf = add_ingestion_date(circuits_renamed_sdf)
 
 # COMMAND ----------
 
@@ -102,7 +126,7 @@ display(circuits_final_sdf)
 
 # COMMAND ----------
 
-circuits_final_sdf.write.parquet("dbfs:/mnt/formula1datalakestudy/processed/circuits", mode="overwrite")
+circuits_final_sdf.write.parquet(f"{processed_catalog_path}/circuits", mode="overwrite")
 
 # COMMAND ----------
 
@@ -111,7 +135,7 @@ circuits_final_sdf.write.parquet("dbfs:/mnt/formula1datalakestudy/processed/circ
 
 # COMMAND ----------
 
-sdf = spark.read.parquet("dbfs:/mnt/formula1datalakestudy/processed/circuits")
+sdf = spark.read.parquet(f"{processed_catalog_path}/circuits")
 
 # COMMAND ----------
 
@@ -120,6 +144,11 @@ display(sdf)
 # COMMAND ----------
 
 sdf.printSchema()
+
+# COMMAND ----------
+
+dbutils.notebook.exit("succes")
+
 
 # COMMAND ----------
 

@@ -4,6 +4,19 @@
 
 # COMMAND ----------
 
+dbutils.widgets.text("p_data_source", "No source input")
+v_data_source = dbutils.widgets.get("p_data_source")
+
+# COMMAND ----------
+
+# MAGIC %run "../includes/configuration"
+
+# COMMAND ----------
+
+# MAGIC %run "../includes/common_functions"
+
+# COMMAND ----------
+
 # MAGIC %md
 # MAGIC ##### Step 1 - Read the json file with Spark dataframe reader
 
@@ -38,7 +51,7 @@ results_schema = StructType([
 
 results_sdf = spark.read \
     .schema(results_schema) \
-    .json("/mnt/formula1datalakestudy/raw/results.json")
+    .json(f"{raw_catalog_path}/results.json")
 
 # COMMAND ----------
 
@@ -47,11 +60,14 @@ display(results_sdf)
 # COMMAND ----------
 
 # MAGIC %md 
-# MAGIC ##### Step 2 - Rename the columns and add ingestion date
+# MAGIC ##### Step 2 - Rename and add new columns
+# MAGIC 1. Rename resultId, raceId, driverId, constructorId, positionText, positionOrder, fastestLap, fastestLapTime, fastestLapSpeed
+# MAGIC 2. Add data_source from input param
+# MAGIC 3. Add ingestion_date with current timestamp
 
 # COMMAND ----------
 
-from pyspark.sql.functions import current_timestamp
+from pyspark.sql.functions import lit
 
 # COMMAND ----------
 
@@ -65,12 +81,16 @@ results_modified_sdf = results_sdf \
     .withColumnRenamed("fastestLap", "fastest_lap") \
     .withColumnRenamed("fastestLapTime", "fastest_lap_time") \
     .withColumnRenamed("fastestLapSpeed", "fastest_lap_speed")  \
-    .withColumn("Ingestion_date", current_timestamp())
+    .withColumn("data_source", lit(v_data_source))
+
+# COMMAND ----------
+
+results_modified_sdf = add_ingestion_date(results_modified_sdf)
 
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ##### Step 3 - Drop the unwanted columns 
+# MAGIC ##### Step 3 - Drop the unwanted columns
 
 # COMMAND ----------
 
@@ -79,12 +99,12 @@ results_final_sdf = results_modified_sdf.drop(results_modified_sdf["statusId"])
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ##### Write ouput to the parquet file
+# MAGIC ##### Step 4 - Write ouput to the processed container in parquet fromat partitioned by race_id
 
 # COMMAND ----------
 
-results_final_sdf.write.parquet("/mnt/formula1datalakestudy/processed/results", mode="overwrite", partitionBy="race_id")
+results_final_sdf.write.parquet(f"{processed_catalog_path}/results", mode="overwrite", partitionBy="race_id")
 
 # COMMAND ----------
 
-
+dbutils.notebook.exit("succes")

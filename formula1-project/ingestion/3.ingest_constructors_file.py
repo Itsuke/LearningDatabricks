@@ -4,6 +4,19 @@
 
 # COMMAND ----------
 
+dbutils.widgets.text("p_data_source", "No source input")
+v_data_source = dbutils.widgets.get("p_data_source")
+
+# COMMAND ----------
+
+# MAGIC %run "../includes/configuration"
+
+# COMMAND ----------
+
+# MAGIC %run "../includes/common_functions"
+
+# COMMAND ----------
+
 # MAGIC %md
 # MAGIC ##### Step 1 - Read the json file with Spark dataframe reader
 
@@ -15,7 +28,7 @@ constructors_schema = "constructorId INT, constructorRef STRING, name STRING, na
 
 constructors_sdf = spark.read \
     .schema(constructors_schema) \
-    .json("/mnt/formula1datalakestudy/raw/constructors.json")
+    .json(f"{raw_catalog_path}/constructors.json")
 
 # COMMAND ----------
 
@@ -33,28 +46,35 @@ constructors_dropped_sdf = constructors_sdf.drop(constructors_sdf["url"])
 # COMMAND ----------
 
 # MAGIC %md 
-# MAGIC ##### Step 3 - Rename the columns and add ingestion date
+# MAGIC ##### Step 3 - Rename and add new columns
+# MAGIC 1. Rename constructorId constructorRef
+# MAGIC 2. Add data_source from input param
+# MAGIC 3. Add ingestion_date with current timestamp
 
 # COMMAND ----------
 
-from pyspark.sql.functions import current_timestamp
+from pyspark.sql.functions import lit
 
 # COMMAND ----------
 
 constructors_final_sdf = constructors_dropped_sdf \
     .withColumnRenamed("constructorId", "constructor_id") \
     .withColumnRenamed("constructorRef", "constructor_ref") \
-    .withColumn("ingestion_date", current_timestamp())
+    .withColumn("data_source", lit(v_data_source))
+
+# COMMAND ----------
+
+constructors_final_sdf = add_ingestion_date(constructors_final_sdf)
 
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ##### Write ouput to the parquet file
+# MAGIC ##### Step 4 - Write ouput to the processed container in parquet fromat
 
 # COMMAND ----------
 
-constructors_final_sdf.write.parquet("/mnt/formula1datalakestudy/processed/constructors", mode="overwrite")
+constructors_final_sdf.write.parquet(f"{processed_catalog_path}/constructors", mode="overwrite")
 
 # COMMAND ----------
 
-
+dbutils.notebook.exit("succes")

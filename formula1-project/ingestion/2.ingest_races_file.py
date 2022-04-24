@@ -4,6 +4,19 @@
 
 # COMMAND ----------
 
+dbutils.widgets.text("p_data_source", "No source input")
+v_data_source = dbutils.widgets.get("p_data_source")
+
+# COMMAND ----------
+
+# MAGIC %run "../includes/configuration"
+
+# COMMAND ----------
+
+# MAGIC %run "../includes/common_functions"
+
+# COMMAND ----------
+
 # MAGIC %md 
 # MAGIC ##### Step 1 - Read the csv file with Spark dataframe reader
 
@@ -26,7 +39,7 @@ my_schema = StructType([
 
 # COMMAND ----------
 
-races_sdf = spark.read.schema(my_schema).csv("/mnt/formula1datalakestudy/raw/races.csv", header=True)
+races_sdf = spark.read.schema(my_schema).csv(f"{raw_catalog_path}/races.csv", header=True)
 
 # COMMAND ----------
 
@@ -36,10 +49,11 @@ display(races_sdf)
 
 # MAGIC %md
 # MAGIC ##### Step 2 - Select and rename wanted columns
+# MAGIC 1. Rename raceId, year, circuitId
 
 # COMMAND ----------
 
-from pyspark.sql.functions import col, lit, to_timestamp, concat, current_timestamp
+from pyspark.sql.functions import col, to_timestamp, concat, lit
 
 # COMMAND ----------
 
@@ -90,7 +104,16 @@ display(races_drop_sdf)
 
 # COMMAND ----------
 
-races_final_sdf = races_drop_sdf.withColumn("ingestion_date", current_timestamp())
+races_final_sdf = add_ingestion_date(races_drop_sdf)
+                   
+
+# COMMAND ----------
+
+from pyspark.sql.functions import lit
+
+# COMMAND ----------
+
+ races_final_sdf = races_final_sdf.withColumn("data_source", lit(v_data_source))
 
 # COMMAND ----------
 
@@ -111,12 +134,16 @@ races_final_sdf.printSchema()
 
 # COMMAND ----------
 
-races_sdf = races_final_sdf.write.parquet("/mnt/formula1datalakestudy/processed/races", mode="overwrite", partitionBy="race_year")
+races_sdf = races_final_sdf.write.parquet(f"{processed_catalog_path}/races", mode="overwrite", partitionBy="race_year")
 
 # COMMAND ----------
 
-sdf = spark.read.parquet("dbfs:/mnt/formula1datalakestudy/processed/races")
+sdf = spark.read.parquet(f"{processed_catalog_path}/races")
 
 # COMMAND ----------
 
 display(sdf)
+
+# COMMAND ----------
+
+dbutils.notebook.exit("succes")
