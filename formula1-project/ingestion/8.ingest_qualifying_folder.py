@@ -38,7 +38,9 @@ display(qualifying_sdf)
 # COMMAND ----------
 
 # MAGIC %md 
-# MAGIC ##### Step 2 - Rename the columns and add ingestion date
+# MAGIC ##### Step 2 - Rename and add new columns
+# MAGIC 1. Rename qualifyId, raceId, driverId, constructorId
+# MAGIC 2. Add ingestion_date with current timestamp
 
 # COMMAND ----------
 
@@ -51,12 +53,12 @@ qualifying_final_sdf = qualifying_sdf \
     .withColumnRenamed("raceId", "race_id") \
     .withColumnRenamed("driverId", "driver_id") \
     .withColumnRenamed("constructorId", "constructor_id") \
-    .withColumn("Ingestion_date", current_timestamp())
+    .withColumn("ingestion_date", current_timestamp())
 
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ##### Write ouput to the parquet file
+# MAGIC ##### Step 3 - Write ouput to the processed container in parquet fromat
 
 # COMMAND ----------
 

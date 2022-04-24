@@ -39,7 +39,9 @@ lap_times_sdf.count()
 # COMMAND ----------
 
 # MAGIC %md 
-# MAGIC ##### Step 2 - Rename the columns and add ingestion date
+# MAGIC ##### Step 2 - Rename and add columns
+# MAGIC 1. Rename raceId, driverId
+# MAGIC 2. Add ingestion_date with current timestamp
 
 # COMMAND ----------
 
@@ -50,12 +52,12 @@ from pyspark.sql.functions import current_timestamp
 lap_times_final_sdf = lap_times_sdf \
     .withColumnRenamed("raceId", "race_id") \
     .withColumnRenamed("driverId", "driver_id") \
-    .withColumn("Ingestion_date", current_timestamp())
+    .withColumn("ingestion_date", current_timestamp())
 
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ##### Write ouput to the parquet file
+# MAGIC ##### Step 3 - Write ouput to the processed container in parquet fromat
 
 # COMMAND ----------
 
