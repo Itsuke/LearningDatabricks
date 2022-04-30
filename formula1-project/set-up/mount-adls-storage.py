@@ -26,16 +26,28 @@ def mount_adls(container_name):
 # COMMAND ----------
 
 mount_adls("raw")
-mount_adls("processed")
 
 # COMMAND ----------
 
 dbutils.fs.ls("/mnt/formula1datalakestudy/raw")
 
+# COMMAND ----------
+
+mount_adls("processed")
 
 # COMMAND ----------
 
 dbutils.fs.ls("/mnt/formula1datalakestudy/processed")
+
+
+# COMMAND ----------
+
+mount_adls("presentation")
+
+# COMMAND ----------
+
+dbutils.fs.ls("/mnt/formula1datalakestudy/presentation")
+
 
 # COMMAND ----------
 
