@@ -40,7 +40,7 @@ results_schema = StructType([
     StructField("laps", IntegerType()),
     StructField("time", StringType()),
     StructField("milliseconds", IntegerType()),
-    StructField("fastestLap", IntegerType()),
+    StructField("fastestLap", StringType()),
     StructField("rank", IntegerType()),
     StructField("fastestLapTime", StringType()),
     StructField("fastestLapSpeed", StringType()),
@@ -108,3 +108,7 @@ results_final_sdf.write.parquet(f"{processed_catalog_path}/results", mode="overw
 # COMMAND ----------
 
 dbutils.notebook.exit("succes")
+
+# COMMAND ----------
+
+

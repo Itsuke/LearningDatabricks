@@ -1,0 +1,1 @@
+The goal of this assaignment is to prepare the same data as presented on https://www.bbc.com/sport/formula1/2020/abu-dhabi-grand-prix/results while using the Ergast data
