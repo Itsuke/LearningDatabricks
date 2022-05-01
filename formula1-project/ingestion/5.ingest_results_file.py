@@ -22,7 +22,7 @@ v_data_source = dbutils.widgets.get("p_data_source")
 
 # COMMAND ----------
 
-from pyspark.sql.types import IntegerType, StringType, StructType, StructField
+from pyspark.sql.types import IntegerType, StringType, DoubleType, StructType, StructField
 
 # COMMAND ----------
 
@@ -36,7 +36,7 @@ results_schema = StructType([
     StructField("position", IntegerType()),
     StructField("positionText", StringType()),
     StructField("positionOrder", IntegerType()),
-    StructField("points", IntegerType()),
+    StructField("points", DoubleType()),
     StructField("laps", IntegerType()),
     StructField("time", StringType()),
     StructField("milliseconds", IntegerType()),
