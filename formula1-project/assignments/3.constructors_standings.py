@@ -58,7 +58,3 @@ if save_as_table:
     race_final_sdf.write.mode("overwrite").format("parquet").saveAsTable("f1_presentation.constructor_standings")
 else:
     race_final_sdf.write.parquet(f"{presentation_catalog_path}/constructor_standings", mode="overwrite")
-
-# COMMAND ----------
-
-
