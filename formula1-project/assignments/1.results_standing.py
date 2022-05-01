@@ -4,7 +4,7 @@
 
 # COMMAND ----------
 
-# MAGIC %run "../../includes/configuration"
+# MAGIC %run "../includes/configuration"
 
 # COMMAND ----------
 
@@ -66,7 +66,7 @@ result_combined_sdf = result_combined_sdf.join(constructors_sdf, "constructor_id
 
 # COMMAND ----------
 
-display(combined_sdf)
+display(result_combined_sdf)
 
 # COMMAND ----------
 
@@ -97,7 +97,10 @@ result_final_sdf = result_dropped_sdf.withColumn("created_date", current_timesta
 
 # COMMAND ----------
 
-result_final_sdf.write.parquet(f"{presentation_catalog_path}/race_results", mode="overwrite")
+if save_as_table:
+    result_final_sdf.write.mode("overwrite").format("parquet").saveAsTable("f1_presentation.race_results")
+else:
+    result_final_sdf.write.parquet(f"{presentation_catalog_path}/race_results", mode="overwrite")
 
 # COMMAND ----------
 

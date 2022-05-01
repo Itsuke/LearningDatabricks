@@ -79,7 +79,10 @@ lap_times_final_sdf = add_ingestion_date(lap_times_modified_sdf)
 
 # COMMAND ----------
 
-lap_times_final_sdf.write.parquet(f"{processed_catalog_path}/lap_times", mode="overwrite")
+if save_as_table:
+    lap_times_final_sdf.write.mode("overwrite").format("parquet").saveAsTable("f1_processed.lap_times")
+else:
+    lap_times_final_sdf.write.parquet(f"{processed_catalog_path}/lap_times", mode="overwrite")
 
 # COMMAND ----------
 

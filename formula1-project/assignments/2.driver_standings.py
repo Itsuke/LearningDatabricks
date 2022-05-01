@@ -4,7 +4,7 @@
 
 # COMMAND ----------
 
-# MAGIC %run "../../includes/configuration"
+# MAGIC %run "../includes/configuration"
 
 # COMMAND ----------
 
@@ -54,7 +54,10 @@ display(race_final_sdf.filter("race_year in (2019, 2020)"))
 
 # COMMAND ----------
 
-race_final_sdf.write.parquet(f"{presentation_catalog_path}/driver_standings", mode="overwrite")
+if save_as_table:
+    race_final_sdf.write.mode("overwrite").format("parquet").saveAsTable("f1_presentation.driver_standings")
+else:
+    race_final_sdf.write.parquet(f"{presentation_catalog_path}/driver_standings", mode="overwrite")
 
 # COMMAND ----------
 

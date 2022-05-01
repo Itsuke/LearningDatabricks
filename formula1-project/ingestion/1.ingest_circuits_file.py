@@ -126,7 +126,10 @@ display(circuits_final_sdf)
 
 # COMMAND ----------
 
-circuits_final_sdf.write.parquet(f"{processed_catalog_path}/circuits", mode="overwrite")
+if save_as_table:
+    circuits_final_sdf.write.mode("overwrite").format("parquet").saveAsTable("f1_processed.circuits")
+else:
+    circuits_final_sdf.write.parquet(f"{processed_catalog_path}/circuits", mode="overwrite")
 
 # COMMAND ----------
 

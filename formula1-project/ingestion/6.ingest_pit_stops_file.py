@@ -76,7 +76,10 @@ pit_stops_final_sdf = add_ingestion_date(pit_stops_modified_sdf)
 
 # COMMAND ----------
 
-pit_stops_final_sdf.write.parquet(f"{processed_catalog_path}/pit_stops", mode="overwrite")
+if save_as_table:
+    pit_stops_final_sdf.write.mode("overwrite").format("parquet").saveAsTable("f1_processed.pit_stops")
+else:
+    pit_stops_final_sdf.write.parquet(f"{processed_catalog_path}/pit_stops", mode="overwrite")
 
 # COMMAND ----------
 

@@ -73,7 +73,10 @@ constructors_final_sdf = add_ingestion_date(constructors_final_sdf)
 
 # COMMAND ----------
 
-constructors_final_sdf.write.parquet(f"{processed_catalog_path}/constructors", mode="overwrite")
+if save_as_table:
+    constructors_final_sdf.write.mode("overwrite").format("parquet").saveAsTable("f1_processed.constructors")
+else:
+    constructors_final_sdf.write.parquet(f"{processed_catalog_path}/constructors", mode="overwrite")
 
 # COMMAND ----------
 

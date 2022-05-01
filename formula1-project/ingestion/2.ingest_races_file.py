@@ -134,7 +134,10 @@ races_final_sdf.printSchema()
 
 # COMMAND ----------
 
-races_sdf = races_final_sdf.write.parquet(f"{processed_catalog_path}/races", mode="overwrite", partitionBy="race_year")
+if save_as_table:
+    races_final_sdf.write.mode("overwrite").format("parquet").partitionBy("race_year").saveAsTable("f1_processed.races")
+else:
+    races_final_sdf.write.parquet(f"{processed_catalog_path}/races", mode="overwrite", partitionBy="race_year")
 
 # COMMAND ----------
 

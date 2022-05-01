@@ -103,7 +103,10 @@ results_final_sdf = results_modified_sdf.drop(results_modified_sdf["statusId"])
 
 # COMMAND ----------
 
-results_final_sdf.write.parquet(f"{processed_catalog_path}/results", mode="overwrite", partitionBy="race_id")
+if save_as_table:
+    results_final_sdf.write.mode("overwrite").format("parquet").partitionBy("race_id").saveAsTable("f1_processed.results")
+else:
+    results_final_sdf.write.parquet(f"{processed_catalog_path}/results", mode="overwrite", partitionBy="race_id")
 
 # COMMAND ----------
 

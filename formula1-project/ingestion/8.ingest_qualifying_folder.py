@@ -81,7 +81,10 @@ qualifying_final_sdf = add_ingestion_date(qualifying_modified_sdf)
 
 # COMMAND ----------
 
-qualifying_final_sdf.write.parquet(f"{processed_catalog_path}/qualifying", mode="overwrite")
+if save_as_table:
+    qualifying_final_sdf.write.mode("overwrite").format("parquet").saveAsTable("f1_processed.qualifying")
+else:
+    qualifying_final_sdf.write.parquet(f"{processed_catalog_path}/qualifying", mode="overwrite")
 
 # COMMAND ----------
 

@@ -99,7 +99,10 @@ drivers_final_sdf = drivers_modified_sdf.drop(drivers_modified_sdf["url"])
 
 # COMMAND ----------
 
-drivers_final_sdf.write.parquet(f"{processed_catalog_path}/drivers", mode="overwrite")
+if save_as_table:
+    drivers_final_sdf.write.mode("overwrite").format("parquet").saveAsTable("f1_processed.drivers")
+else:
+    drivers_final_sdf.write.parquet(f"{processed_catalog_path}/drivers", mode="overwrite")
 
 # COMMAND ----------
 

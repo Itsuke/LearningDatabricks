@@ -3,10 +3,6 @@ dbutils.notebook.help()
 
 # COMMAND ----------
 
-print(dbutils.notebook.run("1.ingest_circuits_file", 0, {"p_data_source":"Ergast API"}))
-
-# COMMAND ----------
-
 files = ["1.ingest_circuits_file",
          "2.ingest_races_file",
          "3.ingest_constructors_file",
