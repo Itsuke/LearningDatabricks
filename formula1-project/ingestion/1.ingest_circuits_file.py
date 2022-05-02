@@ -13,6 +13,11 @@ v_data_source = dbutils.widgets.get("p_data_source")
 
 # COMMAND ----------
 
+dbutils.widgets.text("p_file_date", "2021-03-21")
+v_file_date = dbutils.widgets.get("p_file_date")
+
+# COMMAND ----------
+
 # MAGIC %run "../includes/configuration"
 
 # COMMAND ----------
@@ -43,7 +48,7 @@ circuits_schema = StructType(fields=[StructField("circuitId", IntegerType(), nul
 
 # COMMAND ----------
 
-circuits_with_schema_sdf = spark.read.schema(circuits_schema).csv(f"{raw_catalog_path}/circuits.csv", header=True)
+circuits_with_schema_sdf = spark.read.schema(circuits_schema).csv(f"{raw_incr_load_catalog_path}/{v_file_date}/circuits.csv", header=True)
 
 # COMMAND ----------
 
@@ -96,7 +101,8 @@ circuits_renamed_sdf = circuits_selected_sdf \
     .withColumnRenamed("lat", "latitude") \
     .withColumnRenamed("lng", "longitude") \
     .withColumnRenamed("alt", "altitude") \
-    .withColumn("data_source", lit(v_data_source))
+    .withColumn("data_source", lit(v_data_source)) \
+    .withColumn("file_date", lit(v_file_date))
 
 # COMMAND ----------
 

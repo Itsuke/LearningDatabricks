@@ -9,6 +9,11 @@ v_data_source = dbutils.widgets.get("p_data_source")
 
 # COMMAND ----------
 
+dbutils.widgets.text("p_file_date", "2021-03-21")
+v_file_date = dbutils.widgets.get("p_file_date")
+
+# COMMAND ----------
+
 # MAGIC %run "../includes/configuration"
 
 # COMMAND ----------
@@ -68,7 +73,8 @@ qualifying_modified_sdf = qualifying_sdf \
     .withColumnRenamed("driverId", "driver_id") \
     .withColumnRenamed("constructorId", "constructor_id") \
     .withColumn("data_source", lit(v_data_source)) \
-    .withColumn("ingestion_date", current_timestamp())
+    .withColumn("ingestion_date", current_timestamp()) \
+    .withColumn("file_date", lit(v_file_date))
 
 # COMMAND ----------
 
@@ -81,10 +87,11 @@ qualifying_final_sdf = add_ingestion_date(qualifying_modified_sdf)
 
 # COMMAND ----------
 
-if save_as_table:
-    qualifying_final_sdf.write.mode("overwrite").format("parquet").saveAsTable("f1_processed.qualifying")
-else:
-    qualifying_final_sdf.write.parquet(f"{processed_catalog_path}/qualifying", mode="overwrite")
+lap_times_final_sdf = qualifying_final_sdf.select(reorder_columns_with_partition_param_at_the_end(qualifying_final_sdf, "race_id"))
+
+# COMMAND ----------
+
+increment_load_data(qualifying_final_sdf, "f1_processed", "qualifying", "race_id")
 
 # COMMAND ----------
 

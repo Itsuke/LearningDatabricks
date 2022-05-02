@@ -9,6 +9,11 @@ v_data_source = dbutils.widgets.get("p_data_source")
 
 # COMMAND ----------
 
+dbutils.widgets.text("p_file_date", "2021-03-21")
+v_file_date = dbutils.widgets.get("p_file_date")
+
+# COMMAND ----------
+
 # MAGIC %run "../includes/configuration"
 
 # COMMAND ----------
@@ -39,7 +44,7 @@ my_schema = StructType([
 
 # COMMAND ----------
 
-races_sdf = spark.read.schema(my_schema).csv(f"{raw_catalog_path}/races.csv", header=True)
+races_sdf = spark.read.schema(my_schema).csv(f"{raw_incr_load_catalog_path}/{v_file_date}/races.csv", header=True)
 
 # COMMAND ----------
 
@@ -113,7 +118,9 @@ from pyspark.sql.functions import lit
 
 # COMMAND ----------
 
- races_final_sdf = races_final_sdf.withColumn("data_source", lit(v_data_source))
+ races_final_sdf = races_final_sdf \
+    .withColumn("data_source", lit(v_data_source)) \
+    .withColumn("file_date", lit(v_file_date))
 
 # COMMAND ----------
 

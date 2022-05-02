@@ -9,6 +9,11 @@ v_data_source = dbutils.widgets.get("p_data_source")
 
 # COMMAND ----------
 
+dbutils.widgets.text("p_file_date", "2021-03-21")
+v_file_date = dbutils.widgets.get("p_file_date")
+
+# COMMAND ----------
+
 # MAGIC %run "../includes/configuration"
 
 # COMMAND ----------
@@ -66,7 +71,8 @@ from pyspark.sql.functions import lit
 lap_times_modified_sdf = lap_times_sdf \
     .withColumnRenamed("raceId", "race_id") \
     .withColumnRenamed("driverId", "driver_id") \
-    .withColumn("data_source", lit(v_data_source))
+    .withColumn("data_source", lit(v_data_source)) \
+    .withColumn("file_date", lit(v_file_date))
 
 # COMMAND ----------
 
@@ -79,10 +85,11 @@ lap_times_final_sdf = add_ingestion_date(lap_times_modified_sdf)
 
 # COMMAND ----------
 
-if save_as_table:
-    lap_times_final_sdf.write.mode("overwrite").format("parquet").saveAsTable("f1_processed.lap_times")
-else:
-    lap_times_final_sdf.write.parquet(f"{processed_catalog_path}/lap_times", mode="overwrite")
+lap_times_final_sdf = lap_times_final_sdf.select(reorder_columns_with_partition_param_at_the_end(lap_times_final_sdf, "race_id"))
+
+# COMMAND ----------
+
+increment_load_data(lap_times_final_sdf, "f1_processed", "lap_times", "race_id")
 
 # COMMAND ----------
 
