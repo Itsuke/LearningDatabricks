@@ -51,4 +51,13 @@ dbutils.fs.ls("/mnt/formula1datalakestudy/presentation")
 
 # COMMAND ----------
 
+mount_adls("practice")
+
+# COMMAND ----------
+
+dbutils.fs.ls("/mnt/formula1datalakestudy/practice")
+
+
+# COMMAND ----------
+
 
