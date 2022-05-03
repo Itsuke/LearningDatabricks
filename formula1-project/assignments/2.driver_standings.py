@@ -4,7 +4,16 @@
 
 # COMMAND ----------
 
+dbutils.widgets.text("p_file_date", "2021-03-21")
+v_file_date = dbutils.widgets.get("p_file_date")
+
+# COMMAND ----------
+
 # MAGIC %run "../includes/configuration"
+
+# COMMAND ----------
+
+# MAGIC %run "../includes/common_functions"
 
 # COMMAND ----------
 
@@ -13,15 +22,19 @@
 
 # COMMAND ----------
 
-race_results_sdf = spark.read.parquet(f"{presentation_catalog_path}/race_results")
+race_results_sdf = spark.read.parquet(f"{presentation_catalog_path}/race_results") \
+    .filter(f"file_date = '{v_file_date}'")
 
 # COMMAND ----------
 
-display(race_results_sdf)
+race_year_list = df_column_to_list(race_results_sdf, "race_year")
 
 # COMMAND ----------
 
 from pyspark.sql.functions import sum, count, when, col
+
+race_results_sdf = spark.read.parquet(f"{presentation_catalog_path}/race_results") \
+    .filter(col("race_year").isin(race_year_list))
 
 # COMMAND ----------
 
@@ -50,14 +63,18 @@ race_final_sdf = race_grouped_sdf.withColumn("rank", rank().over(driver_rank_spe
 
 # COMMAND ----------
 
-display(race_final_sdf.filter("race_year in (2019, 2020)"))
+race_final_sdf = race_final_sdf.select(reorder_columns_with_partition_param_at_the_end(race_final_sdf, "race_year"))
 
 # COMMAND ----------
 
-if save_as_table:
-    race_final_sdf.write.mode("overwrite").format("parquet").saveAsTable("f1_presentation.driver_standings")
-else:
-    race_final_sdf.write.parquet(f"{presentation_catalog_path}/driver_standings", mode="overwrite")
+increment_load_data(race_final_sdf, "f1_presentation", "driver_standings", "race_year")
+
+# COMMAND ----------
+
+# MAGIC %sql
+# MAGIC SELECT * 
+# MAGIC   FROM f1_presentation.driver_standings
+# MAGIC  WHERE race_year = 2021;
 
 # COMMAND ----------
 

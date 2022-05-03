@@ -45,7 +45,7 @@ pit_stops_schema = StructType([
 
 pit_stops_sdf = spark.read \
     .schema(pit_stops_schema) \
-    .json(f"{raw_catalog_path}/pit_stops.json", multiLine=True)
+    .json(f"{raw_incr_load_catalog_path}/{v_file_date}/pit_stops.json", multiLine=True)
 
 # COMMAND ----------
 
@@ -82,7 +82,7 @@ pit_stops_final_sdf = add_ingestion_date(pit_stops_modified_sdf)
 
 # COMMAND ----------
 
-results_final_sdf = pit_stops_final_sdf.select(reorder_columns_with_partition_param_at_the_end(pit_stops_final_sdf, "race_id"))
+pit_stops_final_sdf = pit_stops_final_sdf.select(reorder_columns_with_partition_param_at_the_end(pit_stops_final_sdf, "race_id"))
 
 # COMMAND ----------
 

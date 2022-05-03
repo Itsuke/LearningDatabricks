@@ -47,7 +47,7 @@ qualifying_schema = StructType([
 
 qualifying_sdf = spark.read \
     .schema(qualifying_schema) \
-    .json(f"{raw_catalog_path}/qualifying/qualifying_split_*.json", multiLine=True)
+    .json(f"{raw_incr_load_catalog_path}/{v_file_date}/qualifying/qualifying_split_*.json", multiLine=True)
 
 # COMMAND ----------
 
@@ -87,7 +87,7 @@ qualifying_final_sdf = add_ingestion_date(qualifying_modified_sdf)
 
 # COMMAND ----------
 
-lap_times_final_sdf = qualifying_final_sdf.select(reorder_columns_with_partition_param_at_the_end(qualifying_final_sdf, "race_id"))
+qualifying_final_sdf = qualifying_final_sdf.select(reorder_columns_with_partition_param_at_the_end(qualifying_final_sdf, "race_id"))
 
 # COMMAND ----------
 

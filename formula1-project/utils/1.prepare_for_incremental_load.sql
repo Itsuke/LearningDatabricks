@@ -17,7 +17,7 @@ DROP DATABASE IF EXISTS f1_presentation CASCADE
 
 -- COMMAND ----------
 
-CREATE DATABASE IF NOT EXISTS f1_processed
+CREATE DATABASE IF NOT EXISTS f1_presentation
 LOCATION "dbfs:/mnt/formula1datalakestudy/presentation"
 
 -- COMMAND ----------

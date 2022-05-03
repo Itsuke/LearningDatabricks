@@ -44,7 +44,7 @@ lap_times_schema = StructType([
 
 lap_times_sdf = spark.read \
     .schema(lap_times_schema) \
-    .csv(f"{raw_catalog_path}/lap_times/lap_times_split_*.csv")
+    .csv(f"{raw_incr_load_catalog_path}/{v_file_date}/lap_times/lap_times_split_*.csv")
 
 # COMMAND ----------
 
