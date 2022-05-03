@@ -357,4 +357,113 @@ display(df)
 
 # COMMAND ----------
 
+# MAGIC %md 
+# MAGIC ##### Transaction Logs
+
+# COMMAND ----------
+
+# MAGIC %sql 
+# MAGIC CREATE TABLE IF NOT EXISTS f1_practice.drivers_txn (
+# MAGIC   driverId INT,
+# MAGIC   dob DATE,
+# MAGIC   forename STRING, 
+# MAGIC   surname STRING,
+# MAGIC   createdDate DATE, 
+# MAGIC   updatedDate DATE
+# MAGIC )
+# MAGIC USING DELTA
+# MAGIC LOCATION '/mnt/formula1datalakestudy/practice/drivers_txn'
+
+# COMMAND ----------
+
+# MAGIC %sql
+# MAGIC DESC HISTORY f1_practice.drivers_txn
+
+# COMMAND ----------
+
+# MAGIC %sql
+# MAGIC INSERT INTO f1_practice.drivers_txn
+# MAGIC SELECT * FROM f1_practice.driver_merge
+# MAGIC WHERE driverId = 1;
+
+# COMMAND ----------
+
+# MAGIC %sql
+# MAGIC DESC HISTORY f1_practice.drivers_txn
+
+# COMMAND ----------
+
+# MAGIC %sql
+# MAGIC INSERT INTO f1_practice.drivers_txn
+# MAGIC SELECT * FROM f1_practice.driver_merge
+# MAGIC WHERE driverId = 2;
+
+# COMMAND ----------
+
+# MAGIC %sql
+# MAGIC DESC HISTORY f1_practice.drivers_txn
+
+# COMMAND ----------
+
+# MAGIC %sql
+# MAGIC DELETE FROM f1_practice.drivers_txn
+# MAGIC WHERE driverId = 1;
+
+# COMMAND ----------
+
+# MAGIC %sql
+# MAGIC DESC HISTORY f1_practice.drivers_txn
+
+# COMMAND ----------
+
+for driver_id in range(3, 20):
+    spark.sql(f"""INSERT INTO f1_practice.drivers_txn
+                  SELECT * FROM f1_practice.driver_merge
+                  WHERE driverId = {driver_id}""")
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ##### Convert Parquet to Delta
+
+# COMMAND ----------
+
+# MAGIC %sql
+# MAGIC CREATE TABLE IF NOT EXISTS f1_practice.drivers_convert_to_delta2 (
+# MAGIC   driverId INT,
+# MAGIC   dob DATE,
+# MAGIC   forename STRING, 
+# MAGIC   surname STRING,
+# MAGIC   createdDate DATE, 
+# MAGIC   updatedDate DATE
+# MAGIC )
+# MAGIC USING PARQUET
+# MAGIC LOCATION "/mnt/formula1datalakestudy/practice/drivers_convert_to_delta"
+
+# COMMAND ----------
+
+# MAGIC %sql
+# MAGIC INSERT INTO f1_practice.drivers_convert_to_delta
+# MAGIC SELECT * FROM f1_practice.driver_merge;
+
+# COMMAND ----------
+
+# MAGIC %sql
+# MAGIC CONVERT TO DELTA f1_practice.drivers_convert_to_delta
+
+# COMMAND ----------
+
+df = spark.table("f1_practice.drivers_convert_to_delta")
+
+# COMMAND ----------
+
+df.write.format("parquet").save("/mnt/formula1datalakestudy/practice/drivers_convert_to_delta_new")
+
+# COMMAND ----------
+
+# MAGIC %sql 
+# MAGIC CONVERT TO DELTA parquet.`/mnt/formula1datalakestudy/practice/drivers_convert_to_delta_new`
+
+# COMMAND ----------
+
 
