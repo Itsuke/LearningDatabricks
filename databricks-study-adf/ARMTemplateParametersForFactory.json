@@ -4,6 +4,12 @@
 	"parameters": {
 		"factoryName": {
 			"value": "databricks-study-adf"
+		},
+		"ls_formula1datalakestudy_storage_accountKey": {
+			"value": ""
+		},
+		"ls_formula1datalakestudy_storage_properties_typeProperties_url": {
+			"value": "https://formula1datalakestudy.dfs.core.windows.net"
 		}
 	}
 }
